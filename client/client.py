@@ -402,9 +402,9 @@ class RunningScreen(QtWidgets.QDialog, Ui_Running_screen):
 							print("%s pressed" % (button))
 						else:
 							print("%s released" % (button))
-						if button == 'c':
+						if button == 'c' and value:
 							self.speed_level = 0
-							run_action('bwready')
+							self.set_speed_level(str(self.LEVEL_SPEED[abs(self.speed_level)]))
 
 
 				if type & 0x02:
@@ -420,13 +420,16 @@ class RunningScreen(QtWidgets.QDialog, Ui_Running_screen):
 							if self.speed_level <= 5 and self.speed_level  >-5:
 								self.speed_level -= 1
 
-						self.set_speed_level(str(self.LEVEL_SPEED[abs(self.speed_level)]))
-						if self.speed_level > 0:
-								run_action('forward')
-						elif self.speed_level == 0:
-							run_action('bwready')
-						else:
-							run_action('backward')
+						# Only issue commands on down press (1 or -1)
+						if fvalue != 0:
+
+							# Only command back wheels when crossing a boundary condition
+							if self.speed_level == 1:
+									run_action('forward')
+							elif self.speed_level == -1:
+								run_action('backward')
+
+							self.set_speed_level(str(self.LEVEL_SPEED[abs(self.speed_level)]))
 
 
 	def stop_stream(self):
